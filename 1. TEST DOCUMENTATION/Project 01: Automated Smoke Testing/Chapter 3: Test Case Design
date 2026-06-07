@@ -1,1 +1,59 @@
+# Chapter 3: Test Case Design
 
+### 3.1. Critical Flow Selection: Prioritization Methodology
+
+The selection of routes for the Smoke Test is based on a **Business Criticality Matrix**. A flow is considered critical if its failure impedes the application's core purpose or halts value generation.
+
+### **Selection Methodology:**
+
+- **Entry Point Analysis:** Verification of base URL accessibility and the loading of critical assets (CDNs, Fonts, Scripts).
+- **Identity Validation (Gatekeeping):** The Login flow is the primary "blocker." If it fails, the remainder of the test suite is non-executable.
+- **High-Transaction Routes:** Selection of the top 3 pages with the highest traffic or operational importance (e.g., Dashboard, Inventory, Checkout).
+- **Persistence Verification:** A test case must confirm that data queried in the UI matches the expected state of backend services.
+
+### 3.2. Acceptance Criteria & Technical Thresholds
+
+A Smoke Test must not only "pass"; it must do so within performance parameters that guarantee an acceptable user experience and infrastructure stability.
+
+### **Response Thresholds (Internal SLA):**
+
+- **Time to First Byte (TTFB):** Initial server response must be under **800ms**.
+- **DOM Content Loaded:** The main page structure must be ready in less than **3 seconds**.
+- **Total Test Execution:** The complete Smoke Test suite must not exceed **120 seconds**.
+
+### **Protocol Validation (Status Codes):**
+
+- **Success:** 200 OK (Read) and 201 Created (Write/Login) responses.
+- **Automatic Failure:** Any 4XX (Client Error/Permissions) or 5XX (Server/Database Error) response will mark the test as **FAIL**.
+- **Redirections:** 301/302 codes are permitted provided the final destination is a valid and authorized route.
+
+### 3.3. Naming Conventions & Selectors
+
+To maintain scalability and facilitate maintenance by other QA Engineers, the following conventions are applied:
+
+### **File Conventions (Specs):**
+
+Test files must follow the pattern: `[ID]_[Module]_[Type].cy.js`.
+
+- *Example:* `01_auth_smoke.cy.js`
+- *Example:* `02_dashboard_navigation.cy.js`
+
+### **Selector Strategy (Location Priority):**
+
+The use of fragile selectors based on tag hierarchy (e.g., `div > span > button`) is prohibited. The selection hierarchy is:
+
+1. **Testing Attributes (Recommended):** `[data-cy="login-button"]` or `[data-testid="submit-form"]`. These are immune to CSS design changes.
+2. **Text Attributes (If static):** `cy.contains('Submit')`.
+3. **Functional CSS Classes:** `.btn-primary` (Only if testing attributes are unavailable).
+
+### **Code Structure (Mocha/Chai):**
+
+Each Test Case must be self-contained and technically described:
+
+JavaScript
+
+`describe('Smoke Test - Authentication Module', () => {
+  it('Should allow access with valid credentials and redirect to the Dashboard', () => {
+    // Test implementation
+  });
+});`
