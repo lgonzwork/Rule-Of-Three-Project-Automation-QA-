@@ -1,1 +1,35 @@
+# Chapter 6: Maintenance & Continuous Improvement
 
+### 6.1. SOP Review Cycle
+
+Technical documentation is a living entity that must reflect the current state of the software. A review schedule based on development cycle events is established to guarantee the continued validity of **SOP-QA-001**.
+
+### **Update Frequency:**
+
+- **Sprint-Based Reviews:** Upon completion of each development cycle, the QA Engineer must validate whether new deployments affected the critical selectors defined in Chapter 3.
+- **UI/UX Redesign Updates:** Following any major interface changes (component refactoring, style framework migrations), an immediate audit of Cypress scripts must be performed.
+- **Quarterly Audit:** A deep dive review of the document to ensure that Node.js versions, Cypress engine, and local infrastructure dependencies (Chapter 2) remain optimal according to industry standards.
+
+### **Document Version Control:**
+
+Any modification to the SOP must be recorded in the change log, detailing the reason for the adjustment (e.g., *"Updated Login selectors following migration to React 18"*).
+
+---
+
+### 6.2. Performance Optimization & Resilience
+
+The value of a Smoke Test lies in its speed and reliability. A slow or unstable test suite will eventually be ignored by engineering teams.
+
+### **Time-Reduction Strategies:**
+
+- **Parallelization:** Configure Spec file execution to run simultaneously if the infrastructure allows, significantly reducing the **Total Test Execution (TTE)**.
+- **UI Bypass:** Whenever possible, perform authentication via programmatic requests (`cy.request()`) instead of interacting with the UI form in every test, saving critical seconds per execution.
+- **Selective Loading:** Disable the loading of non-critical resources during the test (e.g., analytics scripts, maps, or ads) by utilizing Cypress network interception.
+
+### **Reducing False Positives:**
+
+False positives (tests that fail for reasons unrelated to software errors) are combated through:
+
+- **Asynchronous Management:** Replacing fixed wait times (`cy.wait(5000)`) with dynamic waits based on DOM element appearance or network responses (`cy.intercept()`).
+- **Data Isolation:** Ensuring that each Smoke Test execution clears the local state (cookies, localStorage) to prevent interference between sessions.
+- **Retry Strategy:** Maintaining the retry threshold configured in the environment file to absorb network micro-latencies that do not represent an actual system failure.
