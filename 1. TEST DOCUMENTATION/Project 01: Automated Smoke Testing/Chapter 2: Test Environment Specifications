@@ -1,1 +1,53 @@
+# Chapter 2: Test Environment Specifications
 
+### 2.1. System Requirements
+
+To ensure parity between development and execution environments, the following technical specifications must be met:
+
+- **Node.js Runtime:** Version 20.x (LTS) or higher. Use of a version manager (e.g., **NVM**) is highly recommended for consistency.
+- **Cypress Engine:** Version 13.6.0 or higher. This framework requires a 64-bit architecture.
+- **Supported Browsers:**
+    - **Google Chrome:** Stable version (v120+). It is the standard for Smoke Test execution due to its V8 engine performance.
+    - **Electron:** Integrated Cypress version (primarily used for **Headless/CI** executions).
+- **Package Manager:** npm v10.x or higher / yarn v1.22.x.
+
+### 2.2. Local Infrastructure & Network Resilience
+
+In environments with unstable connectivity or high latency, automatic Cypress binary downloads may fail, blocking the QA pipeline. This protocol implements a **Forced Local Cache** strategy.
+
+### **Binary Management**
+
+To prevent download attempts during initialization, the pre-downloaded binary path must be configured via PowerShell environment variables:
+
+PowerShell
+
+`# Define local binary path to prevent timeouts
+$env:CYPRESS_INSTALL_BINARY = "C:\Users\lugon\Downloads\cypress.zip"
+
+# Verify software integrity without an internet connection
+npx cypress verify`
+
+### **Critical Environment Variables**
+
+The system utilizes a `.env` file (excluded from version control) to parameterize execution without altering the source code:
+
+- **CYPRESS_BASE_URL:** The URL of the environment under test (Staging/Prod).
+- **CYPRESS_RETRIES:** Set to `2` to mitigate **false negatives** caused by network latency.
+- **CYPRESS_VIDEO:** Set to `true` for technical failure auditing.
+
+### 2.3. Credential Management & Security
+
+Access to test environments must follow the **Principle of Least Privilege**. Hardcoding credentials within test files (`.spec.js`) is strictly prohibited.
+
+### **Security Protocol for Test Users**
+
+- **Dynamic Injection:** Credentials must be injected at runtime via Cypress environment variables or the `cypress.env.json` file.
+- **Service Accounts:** Exclusive QA accounts shall be used (e.g., `test_automation_user`), with limited permissions that prevent irreversible administrative actions.
+- **Log Obfuscation:** The framework must ensure that `type()` commands interacting with password fields have console logging disabled in Cypress:
+
+JavaScript
+
+`// Example of secure credential input
+cy.get('#password').type(Cypress.env('TEST_PASSWORD'), { log: false });`
+
+- **Token Lifecycle:** The Smoke Test must validate the creation of a new session in each execution, avoiding the use of stale persistent sessions that could mask errors in the actual authentication flow.
