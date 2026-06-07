@@ -1,1 +1,57 @@
+# Chapter 5: Evidence Management & Defect Reporting
 
+### 5.1. Artifact Storage
+
+Cypress automatically generates visual evidence for every failure detected in `run` mode. These artifacts serve as irrefutable technical proof of the application's state at the exact moment of regression.
+
+### **Directory Structure**
+
+The framework organizes files as follows:
+
+- **Screenshots (`/cypress/screenshots`):** `.png` files captured at the exact millisecond of the exception, showing the DOM state and the error console.
+- **Videos (`/cypress/videos`):** Full recordings of each Spec file execution. These are essential for observing asynchronous behaviors or latency issues that static images might miss.
+
+### **Retention Policy**
+
+To optimize local storage and prevent the buildup of obsolete data:
+
+- **Successful Test Evidence (PASS):** Automatically deleted after the testing session concludes.
+- **Failure Evidence (FAIL):** Retained until the defect is reported in the task manager (Jira) and the corresponding files are attached.
+
+---
+
+### 5.2. Triage Protocol (Root Cause Analysis)
+
+Not every automated test failure represents a bug in the application code. The QA Engineer must perform an initial diagnostic to classify the incident before escalation.
+
+### **Error Classification:**
+
+- **Software Defect (App Bug):** The application does not behave according to requirements (e.g., the Login button is unresponsive). **Action:** Report to Development.
+- **Environment Failure (Infra):** The server is down, the database is unresponsive, or a 500 error occurs. **Action:** Escalate to DevOps/SRE.
+- **False Positive (Script Issue):** The test fails due to a changed CSS selector or insufficient timeout. **Action:** Update the test script.
+
+---
+
+### 5.3. Jira Reporting Standards
+
+Defect communication must be technical, precise, and unambiguous. **Senior Technical Writing** standards are applied to create "Blocker" tickets.
+
+### **Defect Report Template:**
+
+- **Title:** `[Smoke Test][Blocker] - [Module] - [Brief description of the failure]`
+- **Summary:**
+    - Failure detected during the execution of protocol **SOP-QA-001** following deployment to the **[Staging/Prod]** environment.
+- **Steps to Reproduce:**
+    1. Execute `run-smoke-test.ps1`.
+    2. Select the **[Module Name]** module.
+    3. Observe the assertion at step **[Step Number]**.
+- **Actual Result:**
+    - `[Technical description, e.g.: The selector data-cy="dashboard-welcome" was not found after 5000ms]`.
+- **Expected Result:**
+    - `[Correct behavior, e.g.: The Dashboard should render the welcome message after a successful login]`.
+- **Technical Data:**
+    - **URL:** `[Environment Link]`
+    - **Browser:** Chrome v120 (Headless)
+    - **Error Log:** `[Paste terminal log snippet]`
+- **Attachments:**
+    - `[Insert Screenshot and/or Video from /cypress/screenshots]`
