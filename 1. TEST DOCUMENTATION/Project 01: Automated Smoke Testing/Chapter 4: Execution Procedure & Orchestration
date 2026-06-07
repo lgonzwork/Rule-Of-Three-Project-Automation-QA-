@@ -1,1 +1,65 @@
+# Chapter 4: Execution Procedure & Orchestration
 
+### 4.1. System Sanity Check
+
+Before initiating any test suite, it is mandatory to execute a sanity protocol to validate the integrity of the Cypress engine and its dependencies. This prevents **false failures** originating from corrupted files or incompatible versions.
+
+### **The Orchestration Script (run-smoke-test.ps1)**
+
+A PowerShell script has been designed to automate environment configuration. This script serves as the **sole entry point** for Smoke Test execution.
+
+PowerShell
+
+`# run-smoke-test.ps1
+# Purpose: Sanitize environment and execute Smoke Test
+
+# 1. Environment Variable Definition
+$env:CYPRESS_INSTALL_BINARY = "C:\Users\lugon\Downloads\cypress.zip"
+$env:NODE_ENV = "test"
+Write-Host "Initiating Sanity Protocol..." -ForegroundColor Cyan
+
+# 2. Cypress Integrity Verification
+npx cypress verify
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "ERROR: Cypress verification failed. Check the local binary." -ForegroundColor Red
+    exit 1
+}
+
+# 3. Execution Mode Selection
+$mode = Read-Host "Select execution mode (1: Interactive / 2: Headless)"
+if ($mode -eq "1") {
+    npx cypress open --browser chrome
+} else {
+    npx cypress run --browser chrome --reporter spec
+}`
+
+---
+
+### 4.2. Interactive Mode Execution (Headed)
+
+Interactive mode is used exclusively during **Script Development** and **Selector Maintenance** phases. It allows the QA Engineer to observe browser behavior in real-time.
+
+### **Debugging Protocol:**
+
+- **Test Runner Initialization:** Utilizing `npx cypress open`.
+- **Selector Playground:** Using Cypress’s native inspection tool to verify the stability of `data-cy` selectors against DOM changes.
+- **Time Travel:** Reviewing "before" and "after" states of each command in the command log to pinpoint exactly which assertion failed.
+- **Console Monitoring:** Keeping the Developer Console open to capture application JavaScript errors that may not break the test but affect overall integrity.
+
+---
+
+### 4.3. Headless Execution (Unattended)
+
+Headless mode is the standard for **Post-Deployment Validation** and **Continuous Integration (CI)**. This mode prioritizes speed and RAM efficiency by not rendering the browser's graphical interface.
+
+### **Optimized Command Parameters:**
+
+For a clean and professional execution, the following flags are used in the CLI:
+
+- `-browser chrome`: Forces the use of Chrome instead of the default Electron engine for better parity with the end-user environment.
+- `-reporter spec`: Generates a hierarchical log in the terminal, making it easy to read which test cases passed or failed at a glance.
+- `-quiet`: Reduces system log verbosity, displaying only test results and critical errors.
+
+### **Memory Management:**
+
+In Headless mode, Cypress automatically manages cache clearing between each test file (Spec) to prevent **memory leaks**, ensuring the Smoke Test maintains consistent performance even on resource-constrained machines.
