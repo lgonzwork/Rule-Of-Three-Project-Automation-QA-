@@ -1,1 +1,50 @@
+# Chapter 1: Strategic Framework & Governance
 
+---
+
+### 1.1. Purpose & Quality Objectives
+
+The **SOP-QA-001** establishes the regulatory framework for executing immediate stability tests. Within the **Software Development Life Cycle (SDLC)**, this protocol acts as the **Level 0 Quality Gate**. Execution is mandatory following any deployment to Staging or Production environments, functioning as a high-precision early warning system.
+
+### **Strategic Objectives**
+
+- **Operational Risk Mitigation:** Identify catastrophic failures that invalidate system operability before end-users or manual QA teams interact with the build.
+- **Time-to-Market Optimization:** Provide a "Go/No-Go" diagnostic in an execution time of less than **120 seconds**, accelerating post-deployment decision-making.
+- **Data Integrity Governance:** Validate that the persistence layer (Database) and service layer (API) communicate correctly through the User Interface (UI).
+- **Testing Cost Efficiency:** Eliminate "effort waste" (**Lean Testing**) by halting complex regression cycles if base functionalities are compromised.
+
+---
+
+### 1.2. Protocol Scope
+
+To maintain the agility of the Smoke Test, the scope is strictly delimited to critical infrastructure and primary business flows.
+
+### **In-Scope (Covered Flows)**
+
+- **Infrastructure Availability:** Verification of DNS resolution, SSL certificate loading, and delivery of static assets (JS, CSS, Images).
+- **Identity Authentication:** Successful Login flow, token management (JWT/Cookies), and redirection to secure areas.
+- **Core Business Navigation:** Access to the application's three master routes (Home, User Profile, Dashboard/Checkout).
+- **DOM UI Integrity:** Presence and visibility of key elements confirming that the frontend has rendered dynamic data correctly.
+
+### **Out-of-Scope (Critical Exclusions)**
+
+- **Edge Case Testing:** Unusual data inputs or complex error flows are not validated.
+- **Aesthetic Validation (UI/UX):** Pixel misalignments, color palettes, or non-functional responsiveness are not evaluated.
+- **Load Testing:** The protocol does not measure system behavior under stress, only functional unit availability.
+- **Exhaustive Regression:** Secondary functionalities (account settings, profile editing, help modules) are not tested.
+
+---
+
+### 1.3. Technical Glossary & Critical Definitions
+
+To ensure alignment between Engineering, QA, and Product Management, the following terms are defined according to international standards:
+
+- **E2E (End-to-End Testing):** A functional verification methodology that validates an application's workflow from the user's start point to the end point, ensuring all integrated systems function together under real conditions.
+- **Happy Path:** An execution scenario using valid data following the optimal workflow without exceptions. It is the primary indicator that essential business logic is intact.
+- **DOM (Document Object Model):** A programming interface for web documents. In this SOP, the DOM is the target of Cypress selectors; its correct hierarchical structure serves as technical evidence that the frontend has interpreted server logic.
+- **Showstopper / Blocker:** Any technical defect that prevents application usage or further testing execution. A failure in the Smoke Test is automatically classified as a **Blocker**.
+- **Headed vs. Headless Execution:**
+     - **Headed:** Execution with a visible browser interface. Used for visual auditing and script debugging.
+     - **Headless:** Background execution without a GUI. The standard for **CI/CD pipeline** integration due to low resource consumption and superior speed.
+- **XHR/Fetch Monitoring:** A network traffic interception technique to validate that API requests return successful status codes (**200 OK**, **201 Created**) during the test.
+- **Selector Integrity:** The ability of an automation script to locate an element in the DOM uniquely and stably (preferably through `data-cy` or `data-testid` attributes).
